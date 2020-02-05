@@ -1,18 +1,21 @@
 package com.cql.queue;
 
-
 import java.util.Scanner;
 
 /**
- * 用数组模拟队列的实现功能
- * 缺陷：数组不能重复使用，因为当rear=maxSize时，会被判定队列已满不能在添加新数据进去
- * @Author CQL
- * @Date 2020-01-06
+ * 改变数组可以复用，从而转变为环形队列
+ * 用数组模拟环形队列的思路分析如下：
+ * 1） front变量的含义做一个调整，front就指向队列的第一个元素，不再指向第一个元素的前一个位置，也就是arr[front]就是队列的第一个元素；
+ * 2） rear的含义也做一个调整，rear指向队列的最后一个元素的后一个位置，因为希望空出一个空间作为约定
+ * 3） 队列满的条件是：(rear + 1) % maxSize = front, 因为rear是不断增长的(rear是不需要再次置为0的)，因此取模可以实现循环
+ * 4) 队列空的条件是： rear == front
+ * 5） front的初始值是0， rear的初始值是0
+ * 6） 队列中有效的数据的个数是 (rear + maxSize - front) % maxSize
  */
-class QueueImplementedByArray {
+public class CircularQueueImplementedByArray {
 
     public static void main(String[] args) {
-        QueueImplementedByArray queueImplementedByArray = new QueueImplementedByArray(5);
+        CircularQueueImplementedByArray queueImplementedByArray = new CircularQueueImplementedByArray(5); //这里设定的初始值5，但是给队列的最大有效数据个数是4
         char key;
         Scanner scanner = new Scanner(System.in);
         boolean loop = true;
@@ -67,20 +70,17 @@ class QueueImplementedByArray {
     }
 
     private int maxSize; //表示数组的最大容量
-    private int front; //表示队列的头指针
-    private int rear; //表示队列的尾指针
+    private int front; //表示队列的头指针，默认初始化为0了
+    private int rear; //表示队列的尾指针，默认初始化为0了
     private int[] arr; //该数组用于存放数据，模拟队列
 
     /**
      * 初始化数组
      * @param arrMaxSize 初始化队列的大小
      */
-    public QueueImplementedByArray(int arrMaxSize) {
-        this.maxSize = arrMaxSize;
+    public CircularQueueImplementedByArray(int arrMaxSize) {
+        this.maxSize = arrMaxSize; //数组的最大容量
         arr = new int[maxSize];
-        front = -1; //表明指向队列头部,front是指向队列第一数据的前一个位置
-        rear = -1; //直接指向尾部的具体数据,即包含尾部的数据，即rear对应的就是队列尾的数据的下标
-        //PS:front指向的是队列第一个数据的前一个位置，而rear指向队列最后一个数据的位置
     }
 
     /**
@@ -88,7 +88,7 @@ class QueueImplementedByArray {
      * @return true 满了， false 没有满
      */
     public boolean isFull() {
-        return rear == maxSize - 1;
+        return (rear + 1) % maxSize == front;
     }
 
     /**
@@ -109,7 +109,8 @@ class QueueImplementedByArray {
             System.out.println("队列满，不能加入数据");
             return;
         } else {
-            arr[++rear] = n; //先将rear后移，在加入数据，因为rear指向的是最后一个数据的位置
+            arr[rear] = n; //先加入数据，后将rear后移，因为rear指向的是最后一个数据的位置
+            rear = (rear + 1) % maxSize;
         }
     }
 
@@ -119,11 +120,15 @@ class QueueImplementedByArray {
      */
     public int getQueue() {
         if (isEmpty()) {
-            System.out.println("队列空，无法取出元素");
             //通过抛出异常处理
             throw new RuntimeException("队列空，无法取出元素");
         } else {
-            return arr[++front];
+            //1、先把front对应的指保存到一个临时变量里
+            //2、把front后移
+            //3、返回临时变量的值
+            int result = arr[front];
+            front = (front + 1) % maxSize;
+            return result;
         }
     }
 
@@ -134,8 +139,10 @@ class QueueImplementedByArray {
         if (isEmpty()) {
             throw new RuntimeException("队列为空");
         } else {
-            for (int i = 0; i < arr.length; i++) {
-                System.out.printf("arr[%d]=%d\n", i, arr[i]);
+            //从front开始遍历，遍历 ()
+            for (int i = front; i < front + size(); i++) {
+                //这里考虑的是可能rear < front， 那么 i 在 front + size()后就可能比maxSize大，因此要取模
+                System.out.printf("arr[%d]=%d\n", i % maxSize, arr[i % maxSize]);
             }
         }
     }
@@ -147,7 +154,15 @@ class QueueImplementedByArray {
         if (isEmpty()) {
             throw new RuntimeException("队列空，无法取出元素");
         } else {
-            return arr[front+1];
+            return arr[front];
         }
+    }
+
+    /**
+     * 求出当前队列有效数据的个数
+     * @return
+     */
+    public int size() {
+        return (rear + maxSize - front) % maxSize;
     }
 }
