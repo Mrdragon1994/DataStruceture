@@ -134,6 +134,7 @@ class SingleLinkedList {
             temp.next = temp.next.next
         } else {
             println("没有找到需要删除的节点")
+
         }
     }
 

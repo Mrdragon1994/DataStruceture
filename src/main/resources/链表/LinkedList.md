@@ -19,3 +19,7 @@
 1、通过一个辅助变量（指针），找到待删除节点的上一个节点
 2、temp.next = temp.next.next
 
+# 单链表反转的思路
+1、先定义一个节点reverseHead = new HeroNode
+2、从头到尾遍历原来的链表，每遍历一个节点，就将其取出，并放在新的链表的最前端(采用头插法插入)
+3、将原来链表的头结点head.next = reverseHead.next
