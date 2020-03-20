@@ -18,8 +18,9 @@ class JosephuProblem {
 
     static void main(String[] args) {
         CircleSingleLinkedList circleSingleLinkedList = new CircleSingleLinkedList()
-        circleSingleLinkedList.addBoy(5)
-        circleSingleLinkedList.getList()
+        circleSingleLinkedList.addBoy(100)
+     //   circleSingleLinkedList.getList()
+        println(circleSingleLinkedList.rollBack(6,3,100))
     }
 }
 
@@ -76,6 +77,56 @@ class CircleSingleLinkedList {
     }
 
     //出圈问题
+    //因为是环形的，所以需要创建一个辅助指针，指向待删除的节点的前一个节点;所以，我们在创建的时候，要先指向first的前一个,也就是尾部节点
+    //最初,先将first和辅助指针移动到首次报数的位置（start - 1）次
+    //当报数前，让first和辅助指针同时移动，移动（m-1）次
+    //此时，就可以将first指向的节点踢出链表,让first向前移动一次（first = first.next），然后让辅助指针的next指向first
+    /**
+     *
+     * @param start 从第几个值开始数
+     * @param count 要数几下后剔除一个值
+     * @param nums 初始化时节点的个数
+     * @return
+     */
+    List<Boy> rollBack(int start, int count, int nums) {
+        List<Boy> result = new ArrayList<>()
+        //先对数据进行校验
+        if (first == null || start < 1 || start > nums) {
+            println("参数有误")
+            return
+        }
+        //先创建一个辅助指针
+        Boy temp = first
+        //让赋值指针指向first的前一节点，也就是尾部节点
+        while (true) {
+            if (temp.getNext() == first) {
+                break
+            }
+            temp = temp.getNext()
+        }
+        //最开始时，两者先移动到最初报数的位置
+        for (int i = 0; i < start - 1; i++) {
+            first = first.getNext()
+            temp = temp.getNext()
+        }
+        //
+        while (true) {
+            if (temp == first) { //说明只有一个节点了
+                result.add(first)
+                break
+            }
+            //让first和temp移动（count - 1）次
+            for (int j = 0; j < count - 1; j++) {
+                first = first.getNext()
+                temp = temp.getNext()
+            }
+            //此时first指向的节点，就是要被剔除的节点
+            result.add(first)
+            first = first.getNext()
+            temp.setNext(first)
+        }
+        return result
+    }
 }
 
 
