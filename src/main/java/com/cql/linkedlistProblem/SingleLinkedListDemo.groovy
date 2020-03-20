@@ -1,5 +1,8 @@
 package com.cql.linkedlistProblem
 
+/**
+ * 单向链表
+ */
 public class SingleLinkedListProblem {
     public static void main(String[] args) {
         SingleLinkedList singleLinkedList = new SingleLinkedList();
